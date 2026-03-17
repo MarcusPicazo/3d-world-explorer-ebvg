@@ -1,0 +1,10 @@
+# Dependencias
+node_modules/
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Entorno local
+.env
+.env.local

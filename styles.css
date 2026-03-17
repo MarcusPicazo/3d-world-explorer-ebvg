@@ -1,0 +1,94 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #050505; 
+    overflow: hidden;
+    color: white;
+}
+
+/* --- FONDO DE ESTRELLAS PANORÁMICO --- */
+#star-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('https://unpkg.com/three-globe/example/img/night-sky.png');
+    background-size: cover; 
+    background-repeat: repeat;
+    z-index: 0;
+    pointer-events: none;
+    animation: pan-stars 400s linear infinite; 
+}
+
+@keyframes pan-stars {
+    0% { background-position: 0px 0px; }
+    100% { background-position: -5000px 0px; }
+}
+
+#globeViz {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+/* Glassmorphism panels */
+.glass-panel {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Globe.gl Tooltip */
+.scene-tooltip {
+    z-index: 50 !important;
+}
+.custom-tooltip {
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+/* Vertical Zoom Slider */
+input[type=range][orient=vertical] {
+    writing-mode: bt-lr; 
+    -webkit-appearance: slider-vertical;
+    width: 6px;
+    height: 100px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Loading Screen */
+#loader { transition: opacity 0.5s ease-out; }
+
+/* Owl SVG Animations */
+@keyframes float-owl {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+@keyframes blink-owl {
+    0%, 96%, 98%, 100% { transform: scaleY(1); }
+    97%, 99% { transform: scaleY(0.1); }
+}
+.owl-anim-float { animation: float-owl 3s ease-in-out infinite; }
+.owl-anim-blink { animation: blink-owl 5s infinite; }
