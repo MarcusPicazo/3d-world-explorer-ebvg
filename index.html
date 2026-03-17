@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Marcus Escalona">
+    <meta name="description" content="Atlas interactivo 3D para estudiantes. Un explorador mundial educativo con datos geográficos e históricos.">
+    <title>Explorador Mundial 3D | App Educativa</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.136.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/globe.gl@2.30.0/dist/globe.gl.min.js"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div id="star-background"></div>
+
+    <div id="loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 text-white">
+        <i data-lucide="globe-2" class="w-16 h-16 animate-spin text-blue-500 mb-4"></i>
+        <h2 id="ui-loading-title" class="text-2xl font-bold tracking-wider text-center px-4">Cargando Atlas 3D...</h2>
+        <p id="ui-loading-desc" class="text-gray-400 mt-2 text-center px-4">Preparando datos geográficos e históricos</p>
+    </div>
+
+    <div id="globeViz"></div>
+
+    <div class="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-4 md:p-6">
+        
+        <div class="flex flex-col items-start pointer-events-auto gap-3 md:gap-4 w-full sm:w-auto">
+            
+            <div class="glass-panel px-4 py-3 md:px-5 md:py-4 rounded-2xl shadow-2xl flex items-center gap-4 w-full sm:w-auto">
+                <h1 class="text-xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400 flex items-center gap-3 m-0">
+                    <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center flex-shrink-0">
+                        <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(58,134,255,0.6)]" xmlns="http://www.w3.org/2000/svg">
+                            <g class="owl-anim-float">
+                                <path d="M20,50 Q5,70 25,85" fill="#1D4ED8" stroke="#1D4ED8" stroke-width="5" stroke-linecap="round"/>
+                                <path d="M80,50 Q95,70 75,85" fill="#1D4ED8" stroke="#1D4ED8" stroke-width="5" stroke-linecap="round"/>
+                                <path d="M 40 90 Q 35 95 45 95 Z" fill="#F59E0B" />
+                                <path d="M 60 90 Q 65 95 55 95 Z" fill="#F59E0B" />
+                                <circle cx="50" cy="55" r="30" fill="#3A86FF" />
+                                <circle cx="50" cy="65" r="20" fill="#E0E7FF" />
+                                <circle cx="38" cy="45" r="12" fill="white" />
+                                <circle cx="62" cy="45" r="12" fill="white" />
+                                <g class="owl-anim-blink" style="transform-origin: 50px 45px;">
+                                    <circle cx="38" cy="45" r="6" fill="#0F172A" />
+                                    <circle cx="62" cy="45" r="6" fill="#0F172A" />
+                                    <circle cx="36" cy="43" r="2" fill="white" />
+                                    <circle cx="60" cy="43" r="2" fill="white" />
+                                </g>
+                                <polygon points="46,52 54,52 50,60" fill="#F59E0B" />
+                                <polygon points="50,5 20,15 50,25 80,15" fill="#1E3A8A" />
+                                <path d="M35,20 L35,30 Q50,35 65,30 L65,20 Z" fill="#1E3A8A" />
+                                <line x1="50" y1="15" x2="85" y2="25" stroke="#FBBF24" stroke-width="2" />
+                                <line x1="85" y1="25" x2="85" y2="35" stroke="#FBBF24" stroke-width="2" stroke-dasharray="2,1" />
+                                <rect x="35" y="75" width="30" height="15" fill="#EF4444" rx="2" />
+                                <line x1="50" y1="75" x2="50" y2="90" stroke="#B91C1C" stroke-width="2" />
+                            </g>
+                        </svg>
+                    </div>
+                    Atlas EBVG
+                </h1>
+                <div class="hidden md:block border-l border-white/20 pl-4">
+                    <p id="ui-subtitle" class="text-xs md:text-sm text-gray-300 font-medium">Atlas Interactivo para Estudiantes</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="glass-panel p-1.5 rounded-xl flex gap-1 shadow-2xl flex-1 sm:flex-none justify-center">
+                    <button id="btn-continentes" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 bg-blue-600 shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
+                        <i data-lucide="earth" class="w-4 h-4"></i> <span id="ui-btn-cont">Continentes</span>
+                    </button>
+                    <button id="btn-paises" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 text-gray-300 hover:bg-white/10 flex items-center justify-center gap-2">
+                        <i data-lucide="flag" class="w-4 h-4"></i> <span id="ui-btn-count">Países</span>
+                    </button>
+                </div>
+
+                <div class="glass-panel p-1 rounded-full flex gap-1 shadow-xl border border-white/20 flex-shrink-0">
+                    <button id="btn-lang-es" class="lang-btn active w-8 h-8 rounded-full flex items-center justify-center transition-all border-2 border-transparent overflow-hidden shadow-md p-0" title="Español">
+                        <img src="https://flagcdn.com/es.svg" alt="Español" class="w-full h-full object-cover">
+                    </button>
+                    <button id="btn-lang-en" class="lang-btn w-8 h-8 rounded-full flex items-center justify-center transition-all border-2 border-transparent overflow-hidden shadow-md p-0" title="English">
+                        <img src="https://flagcdn.com/gb.svg" alt="English" class="w-full h-full object-cover">
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pointer-events-auto self-center glass-panel px-4 py-2 md:px-6 md:py-3 rounded-full mb-4 md:mb-8 animate-pulse text-center">
+            <p id="ui-instruction" class="text-xs md:text-sm text-gray-300 flex items-center justify-center gap-2">
+                <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
+                Toca o haz clic en una región
+            </p>
+        </div>
+    </div>
+
+    <div class="fixed bottom-24 md:bottom-12 left-4 md:left-8 z-30 pointer-events-auto flex flex-col items-center gap-3 glass-panel p-2 rounded-full shadow-2xl border border-white/20">
+        <button id="btn-zoom-in" class="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-500/50 transition-colors flex items-center justify-center text-white" title="Zoom In">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+        </button>
+        <div class="py-2">
+            <input type="range" id="zoom-slider" min="0" max="100" step="any" value="50" orient="vertical">
+        </div>
+        <button id="btn-zoom-out" class="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-500/50 transition-colors flex items-center justify-center text-white" title="Zoom Out">
+            <i data-lucide="minus" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <div id="info-panel" class="fixed top-0 right-0 h-full w-full sm:w-[450px] glass-panel z-40 transform translate-x-full transition-transform duration-500 ease-in-out shadow-2xl border-l border-white/10 flex flex-col">
+        
+        <div class="p-4 md:p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+            <h2 id="panel-title" class="text-2xl md:text-3xl font-bold text-white tracking-tight">Name</h2>
+            <button id="btn-close-panel" class="p-2 rounded-full hover:bg-white/20 transition-colors text-gray-300 hover:text-white bg-black/30 border border-white/10 shadow-sm">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-6 overflow-y-auto flex-1 text-gray-200 space-y-6 md:space-y-8">
+            
+            <div class="grid grid-cols-2 gap-3 md:gap-4">
+                <div class="bg-black/30 p-3 md:p-4 rounded-xl border border-white/5">
+                    <div class="text-gray-400 text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <i data-lucide="users" class="w-3 h-3"></i> <span id="ui-panel-pop-lbl">Población</span>
+                    </div>
+                    <div id="panel-pop" class="text-lg md:text-xl font-bold text-blue-300">--</div>
+                </div>
+                <div class="bg-black/30 p-3 md:p-4 rounded-xl border border-white/5">
+                    <div class="text-gray-400 text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <i data-lucide="maximize" class="w-3 h-3"></i> <span id="ui-panel-area-lbl">Tamaño</span>
+                    </div>
+                    <div id="panel-area" class="text-lg md:text-xl font-bold text-emerald-300">--</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-shrink-0 self-center md:self-start">
+                    <div class="w-16 h-16 flex items-center justify-center flex-shrink-0">
+                        <svg viewBox="0 0 100 100" class="w-16 h-16 drop-shadow-[0_0_10px_rgba(58,134,255,0.5)]" xmlns="http://www.w3.org/2000/svg">
+                            <g class="owl-anim-float">
+                                <path d="M20,50 Q5,70 25,85" fill="#1D4ED8" stroke="#1D4ED8" stroke-width="5" stroke-linecap="round"/>
+                                <path d="M80,50 Q95,70 75,85" fill="#1D4ED8" stroke="#1D4ED8" stroke-width="5" stroke-linecap="round"/>
+                                <path d="M 40 90 Q 35 95 45 95 Z" fill="#F59E0B" />
+                                <path d="M 60 90 Q 65 95 55 95 Z" fill="#F59E0B" />
+                                <circle cx="50" cy="55" r="30" fill="#3A86FF" />
+                                <circle cx="50" cy="65" r="20" fill="#E0E7FF" />
+                                <circle cx="38" cy="45" r="12" fill="white" />
+                                <circle cx="62" cy="45" r="12" fill="white" />
+                                <g class="owl-anim-blink" style="transform-origin: 50px 45px;">
+                                    <circle cx="38" cy="45" r="6" fill="#0F172A" />
+                                    <circle cx="62" cy="45" r="6" fill="#0F172A" />
+                                    <circle cx="36" cy="43" r="2" fill="white" />
+                                    <circle cx="60" cy="43" r="2" fill="white" />
+                                </g>
+                                <polygon points="46,52 54,52 50,60" fill="#F59E0B" />
+                                <polygon points="50,5 20,15 50,25 80,15" fill="#1E3A8A" />
+                                <path d="M35,20 L35,30 Q50,35 65,30 L65,20 Z" fill="#1E3A8A" />
+                                <line x1="50" y1="15" x2="85" y2="25" stroke="#FBBF24" stroke-width="2" />
+                                <line x1="85" y1="25" x2="85" y2="35" stroke="#FBBF24" stroke-width="2" stroke-dasharray="2,1" />
+                                <rect x="35" y="75" width="30" height="15" fill="#EF4444" rx="2" />
+                                <line x1="50" y1="75" x2="50" y2="90" stroke="#B91C1C" stroke-width="2" />
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+                <div class="bg-blue-900/30 border border-blue-400/30 rounded-2xl md:rounded-tl-none p-4 relative shadow-lg backdrop-blur-sm">
+                    <h3 class="text-sm font-bold text-blue-300 mb-2 flex items-center justify-center md:justify-start gap-2">
+                        <i data-lucide="graduation-cap" class="w-5 h-5"></i> <span id="ui-owl-says">Profe Búho te cuenta:</span>
+                    </h3>
+                    <p id="panel-history" class="text-xs md:text-sm leading-relaxed text-gray-200 text-justify">--</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-base md:text-lg font-semibold text-white mb-3 border-b border-white/10 pb-2 flex items-center gap-2">
+                    <i data-lucide="award" class="text-yellow-400 w-5 h-5"></i> <span id="ui-key-facts">Datos Destacados</span>
+                </h3>
+                <ul id="panel-events" class="space-y-2 text-xs md:text-sm text-gray-300 list-disc list-inside">
+                    </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js" defer></script>
+</body>
+</html>

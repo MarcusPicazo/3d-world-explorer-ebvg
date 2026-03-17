@@ -1,0 +1,23 @@
+{
+  "name": "3d-world-explorer",
+  "version": "1.0.0",
+  "description": "Atlas interactivo 3D para estudiantes utilizando Three.js y Globe.gl.",
+  "main": "main.js",
+  "scripts": {
+    "start": "serve"
+  },
+  "keywords": [
+    "three.js",
+    "globe.gl",
+    "tailwind-css",
+    "javascript",
+    "front-end",
+    "dataviz",
+    "education"
+  ],
+  "author": "Marcus Escalona",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
